@@ -36,6 +36,7 @@ namespace oscilator
     double osc_mass = 0;
     double osc_len = 0;
     double osc_ampl = 0;
+    double osc_latitude = 90;
 }
 
 
@@ -81,6 +82,7 @@ cplanet init_planet ()
     const int osc_len = 6;
     const int time_multiplier = 7;
     const int osc_ampl = 8;
+    const int osc_latitude = 9;
 
     cplanet planet;
 
@@ -133,6 +135,9 @@ cplanet init_planet ()
                 else if (parameter == osc_ampl)
                     oscilator::osc_ampl = atoi (cmd);
 
+                else if (parameter == osc_latitude)
+                    oscilator::osc_latitude = atof (cmd);
+
                 else
                     assert (!"Unknown error!");
 
@@ -164,6 +169,9 @@ cplanet init_planet ()
 
                 else if (!stricmp (cmd, "/osc_ampl") || !stricmp (cmd, "/oa"))
                     parameter = osc_ampl;
+
+                else if (!stricmp (cmd, "/osc_latitude") || !stricmp (cmd, "/location") || !stricmp (cmd, "/lc"))
+                    parameter = osc_latitude;
 
                 else
                     assert (!"Unknown parameter!");
@@ -235,7 +243,7 @@ int draw_plot (cplanet* planet, long max_time)
     double cur_x = 0;
     double cur_y = 0;
     double cycle_freq = _cfreq;
-    double angular_velocity = _angular;
+    double angular_velocity = _angular * sin (oscilator::osc_latitude * phys::pi / 180);
 
     while (current_time < max_time)
     {
