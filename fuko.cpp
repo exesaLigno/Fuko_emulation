@@ -28,6 +28,7 @@ namespace phys
 namespace settings
 {
     int time_multiplier = 1;
+    long max_time = 1000;
 }
 
 
@@ -54,7 +55,7 @@ double  get_cycle_freq  (cplanet* planet);
 #define cfreq get_cycle_freq (&planet)
 #define _cfreq get_cycle_freq (planet)
 
-int     draw_plot       (cplanet* planet, long max_time);
+int     draw_plot       (cplanet* planet);
 
 
 
@@ -65,7 +66,7 @@ int main ()
     cplanet planet = init_planet ();
     printf ("%s: mass %g, radius %g, day %g\n", planet.name, planet.mass, planet.radius, planet.day);
     printf ("gravity on %s is %g, angular velocity is %g\n", planet.name, gravity, angular);
-    draw_plot (&planet, 8000);
+    draw_plot (&planet);
     return 0;
 }
 
@@ -83,6 +84,7 @@ cplanet init_planet ()
     const int time_multiplier = 7;
     const int osc_ampl = 8;
     const int osc_latitude = 9;
+    const int max_time = 10;
 
     cplanet planet;
 
@@ -138,6 +140,9 @@ cplanet init_planet ()
                 else if (parameter == osc_latitude)
                     oscilator::osc_latitude = atof (cmd);
 
+                else if (parameter == max_time)
+                    settings::max_time = atoi (cmd);
+
                 else
                     assert (!"Unknown error!");
 
@@ -172,6 +177,9 @@ cplanet init_planet ()
 
                 else if (!stricmp (cmd, "/osc_latitude") || !stricmp (cmd, "/location") || !stricmp (cmd, "/lc"))
                     parameter = osc_latitude;
+
+                else if (!stricmp (cmd, "/max_time") || !stricmp (cmd, "/mt"))
+                    parameter = max_time;
 
                 else
                     assert (!"Unknown parameter!");
@@ -216,7 +224,7 @@ double get_cycle_freq (cplanet* planet)
 }
 
 
-int draw_plot (cplanet* planet, long max_time)
+int draw_plot (cplanet* planet)
 {
     txCreateWindow (600, 600);
 
@@ -245,7 +253,7 @@ int draw_plot (cplanet* planet, long max_time)
     double cycle_freq = _cfreq;
     double angular_velocity = _angular * sin (oscilator::osc_latitude * phys::pi / 180);
 
-    while (current_time < max_time)
+    while (current_time < settings::max_time)
     {
         double deflection = oscilator::osc_ampl * 100 * sin (cycle_freq * current_time);
         cur_x = cos (angular_velocity * current_time) * deflection - sin (angular_velocity * current_time) * deflection;
